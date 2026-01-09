@@ -1,0 +1,5 @@
+## This file must be created and configured locally
+## Copy this file to local.properties and update the flutter.sdk path
+
+sdk.dir=/path/to/Android/sdk
+flutter.sdk=/path/to/flutter
