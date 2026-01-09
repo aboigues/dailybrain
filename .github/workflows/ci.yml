@@ -42,7 +42,7 @@ jobs:
         run: flutter build apk --debug
 
       - name: Build iOS (dry run)
-        run: flutter build ios --debug --no-codesign
+        run: flutter build ios --no-codesign
 
       # Constitution Quality Gate: Pre-Commit
       # - Linting passes (flutter analyze)
