@@ -1,0 +1,63 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Constitution Principle III: Server-Side Validation (NON-NEGOTIABLE)
+    // All write operations must be validated by Cloud Functions
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      // Users can read their own data
+      allow read: if isOwner(userId);
+
+      // Users can create their own profile (anonymous auth)
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+
+      // Users can update their own data (except sensitive fields)
+      allow update: if isOwner(userId) &&
+        // Cannot modify these fields directly (only via Cloud Functions)
+        !request.resource.data.diff(resource.data).affectedKeys()
+          .hasAny(['totalScore', 'quizzesCompleted', 'currentStreak', 'longestStreak']);
+    }
+
+    // Quizzes collection - Read only
+    // Constitution Principle III: Quiz content is read-only for clients
+    match /quizzes/{quizId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Only admins via Firebase Console or Cloud Functions
+    }
+
+    // Scores collection
+    // Constitution Principle III: Scores validated server-side
+    match /scores/{scoreId} {
+      // Users can read their own scores
+      allow read: if isAuthenticated() &&
+        resource.data.userId == request.auth.uid;
+
+      // Scores can only be created via Cloud Functions
+      // Client submissions go through submitScore Cloud Function
+      allow write: if false;
+    }
+
+    // Daily Rankings collection - Read only
+    match /rankings_daily/{rankingId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Updated by Cloud Functions only
+    }
+
+    // Global Rankings collection - Read only
+    match /rankings_global/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Updated by Cloud Functions only
+    }
+  }
+}
