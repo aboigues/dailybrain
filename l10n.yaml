@@ -1,0 +1,12 @@
+# Constitution Principle VII: Internationalization-First Design
+# Configuration for Flutter's internationalization code generation
+
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-localization-file: app_localizations.dart
+output-class: AppLocalizations
+
+# Supported locales for MVP (Constitution: English + French)
+preferred-supported-locales:
+  - en
+  - fr

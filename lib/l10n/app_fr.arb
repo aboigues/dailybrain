@@ -1,0 +1,268 @@
+{
+  "@@locale": "fr",
+
+  "appTitle": "DailyBrain",
+  "@appTitle": {
+    "description": "Nom de l'application"
+  },
+
+  "appTagline": "Teste ton cerveau en 1 minute",
+  "@appTagline": {
+    "description": "Slogan principal sur l'écran d'accueil"
+  },
+
+  "startButton": "Commencer",
+  "@startButton": {
+    "description": "Bouton pour démarrer le quiz"
+  },
+
+  "seeRankingButton": "Voir le classement",
+  "@seeRankingButton": {
+    "description": "Bouton pour voir l'écran de classement"
+  },
+
+  "streakLabel": "Série : {count} jours",
+  "@streakLabel": {
+    "description": "Libellé affichant le compteur de série actuel",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "12"
+      }
+    }
+  },
+
+  "quizOfTheDay": "Quiz du {date}",
+  "@quizOfTheDay": {
+    "description": "Titre affichant la date du quiz",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "15 jan 2024"
+      }
+    }
+  },
+
+  "questionsCount": "{count} questions",
+  "@questionsCount": {
+    "description": "Nombre de questions dans le quiz",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+
+  "secondsLabel": "{count} secondes",
+  "@secondsLabel": {
+    "description": "Durée en secondes",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "60"
+      }
+    }
+  },
+
+  "nextQuizIn": "Prochain quiz dans : {time}",
+  "@nextQuizIn": {
+    "description": "Compte à rebours jusqu'au prochain quiz",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "18h32"
+      }
+    }
+  },
+
+  "questionProgress": "Question {current}/{total}",
+  "@questionProgress": {
+    "description": "Affiche le numéro de la question actuelle",
+    "placeholders": {
+      "current": {
+        "type": "int",
+        "example": "3"
+      },
+      "total": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+
+  "validateButton": "Valider",
+  "@validateButton": {
+    "description": "Bouton pour valider la réponse"
+  },
+
+  "congratulations": "Bravo !",
+  "@congratulations": {
+    "description": "Message de succès sur l'écran de résultat"
+  },
+
+  "pointsLabel": "POINTS",
+  "@pointsLabel": {
+    "description": "Libellé pour l'affichage des points"
+  },
+
+  "correctAnswers": "{count} bonnes réponses",
+  "@correctAnswers": {
+    "description": "Nombre de réponses correctes",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "4"
+      }
+    }
+  },
+
+  "wrongAnswers": "{count} erreur",
+  "@wrongAnswers": {
+    "description": "Nombre de mauvaises réponses",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
+
+  "speedBonus": "Bonus vitesse : +{points}",
+  "@speedBonus": {
+    "description": "Points de bonus de vitesse",
+    "placeholders": {
+      "points": {
+        "type": "int",
+        "example": "28"
+      }
+    }
+  },
+
+  "streakMaintained": "Série maintenue !",
+  "@streakMaintained": {
+    "description": "Message quand la série est maintenue"
+  },
+
+  "yourRank": "Ton rang : #{rank}/{total}",
+  "@yourRank": {
+    "description": "Position de classement de l'utilisateur",
+    "placeholders": {
+      "rank": {
+        "type": "int",
+        "example": "234"
+      },
+      "total": {
+        "type": "int",
+        "example": "5892"
+      }
+    }
+  },
+
+  "nextQuizAt": "Prochain quiz : {time}",
+  "@nextQuizAt": {
+    "description": "Heure du prochain quiz",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "21h15"
+      }
+    }
+  },
+
+  "rankingTitle": "Classement",
+  "@rankingTitle": {
+    "description": "Titre de l'écran de classement"
+  },
+
+  "dailyRanking": "Quotidien",
+  "@dailyRanking": {
+    "description": "Onglet classement quotidien"
+  },
+
+  "globalRanking": "Global",
+  "@globalRanking": {
+    "description": "Onglet classement global"
+  },
+
+  "weeklyRanking": "Semaine",
+  "@weeklyRanking": {
+    "description": "Onglet classement hebdomadaire"
+  },
+
+  "monthlyRanking": "Mois",
+  "@monthlyRanking": {
+    "description": "Onglet classement mensuel"
+  },
+
+  "you": "TOI",
+  "@you": {
+    "description": "Libellé pour l'utilisateur actuel dans le classement"
+  },
+
+  "alreadyPlayedToday": "Tu as déjà joué aujourd'hui",
+  "@alreadyPlayedToday": {
+    "description": "Message quand l'utilisateur a déjà complété le quiz du jour"
+  },
+
+  "viewMyScore": "Voir mon score",
+  "@viewMyScore": {
+    "description": "Bouton pour voir le score du jour"
+  },
+
+  "noInternet": "Pas de connexion",
+  "@noInternet": {
+    "description": "Message hors ligne"
+  },
+
+  "retry": "Réessayer",
+  "@retry": {
+    "description": "Bouton de réessai"
+  },
+
+  "offlineInfo": "Tu peux consulter tes stats en attendant",
+  "@offlineInfo": {
+    "description": "Message d'information pour le mode hors ligne"
+  },
+
+  "streakAtRisk": "⚠️ Ta série est en danger !",
+  "@streakAtRisk": {
+    "description": "Avertissement quand l'utilisateur n'a pas encore joué aujourd'hui"
+  },
+
+  "streakAtRiskMessage": "Tu n'as pas encore joué aujourd'hui",
+  "@streakAtRiskMessage": {
+    "description": "Détails pour série en danger"
+  },
+
+  "playNow": "Jouer maintenant",
+  "@playNow": {
+    "description": "Bouton pour jouer au quiz immédiatement"
+  },
+
+  "streakLost": "Ta série de {count} jours est terminée 😢",
+  "@streakLost": {
+    "description": "Message quand la série est perdue",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "15"
+      }
+    }
+  },
+
+  "startOver": "Recommencer",
+  "@startOver": {
+    "description": "Bouton pour démarrer une nouvelle série"
+  },
+
+  "saveStreakMessage": "Regarde une vidéo pour sauver ton streak",
+  "@saveStreakMessage": {
+    "description": "Message pour l'option de récupération de série"
+  },
+
+  "loadingRanking": "Chargement du classement...",
+  "@loadingRanking": {
+    "description": "Message de chargement pendant la pub"
+  }
+}

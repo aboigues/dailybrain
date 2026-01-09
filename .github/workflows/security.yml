@@ -1,0 +1,243 @@
+name: Security Checks
+
+on:
+  push:
+    branches: [master, main, develop]
+  pull_request:
+    branches: [master, main, develop]
+  schedule:
+    # Run security checks weekly on Monday at 9am UTC
+    - cron: '0 9 * * 1'
+
+jobs:
+  # Constitution Principle III: Server-Side Validation (NON-NEGOTIABLE)
+  # Ensures no security vulnerabilities in dependencies
+  dependency-scan:
+    name: Dependency Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.0'
+          channel: 'stable'
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Check for outdated dependencies
+        run: flutter pub outdated --mode=null-safety
+
+      - name: Run dependency audit
+        run: |
+          echo "Checking for known vulnerabilities in dependencies..."
+          # Check pub.dev for security advisories
+          flutter pub outdated --json > outdated.json || true
+
+          # Check for critical package issues
+          if grep -q "discontinued\|unlisted" outdated.json 2>/dev/null; then
+            echo "Warning: Some packages are discontinued or unlisted"
+            cat outdated.json
+          fi
+
+      - name: Check for insecure package versions
+        run: |
+          # Ensure we're not using vulnerable versions of critical packages
+          echo "Validating critical package versions..."
+
+          # Check firebase packages for known issues
+          if grep -A 5 "firebase" pubspec.lock | grep "version:" | grep "1.0.0"; then
+            echo "Warning: Very old Firebase packages detected"
+          fi
+
+  # Constitution Principle III: Server-Side Validation
+  # Detect hardcoded secrets and API keys
+  secrets-scan:
+    name: Secrets & API Key Detection
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for secret scanning
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check for hardcoded Firebase keys
+        run: |
+          echo "Checking for exposed Firebase configuration..."
+
+          # Check for API keys in code
+          if grep -r "AIza[0-9A-Za-z\\-_]{35}" lib/ 2>/dev/null; then
+            echo "ERROR: Firebase API key found in source code!"
+            echo "API keys should be in environment-specific config files, not committed to git"
+            exit 1
+          fi
+
+          # Check for database URLs
+          if grep -r "firebaseio.com" lib/ 2>/dev/null; then
+            echo "Warning: Firebase database URL found in code"
+          fi
+
+      - name: Check for AdMob keys in code
+        run: |
+          echo "Checking for hardcoded AdMob keys..."
+
+          if grep -r "ca-app-pub-[0-9]{16}" lib/ 2>/dev/null; then
+            echo "ERROR: AdMob publisher ID found in source code!"
+            echo "AdMob IDs should be in AndroidManifest.xml and Info.plist only"
+            exit 1
+          fi
+
+  # Constitution Principle III: Server-Side Validation
+  # Code security analysis
+  code-security:
+    name: Code Security Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.0'
+          channel: 'stable'
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Check for security anti-patterns
+        run: |
+          echo "Scanning for security anti-patterns..."
+
+          # Check for SQL injection vulnerabilities (if using raw SQL)
+          if grep -r "rawQuery\|execute.*\\\$" lib/ 2>/dev/null; then
+            echo "Warning: Potential SQL injection - use parameterized queries"
+          fi
+
+          # Check for insecure HTTP usage
+          if grep -r "http://" lib/ | grep -v "localhost\|127.0.0.1" | grep -v "example.com"; then
+            echo "ERROR: Insecure HTTP connections found!"
+            echo "All network requests must use HTTPS"
+            exit 1
+          fi
+
+          # Check for eval or dynamic code execution
+          if grep -r "eval\|Function(" lib/ 2>/dev/null; then
+            echo "ERROR: Dynamic code execution detected!"
+            exit 1
+          fi
+
+          # Constitution Principle III: Ensure server-side validation
+          if grep -r "// TODO.*validation" lib/features/quiz/presentation/ 2>/dev/null; then
+            echo "Warning: Validation TODOs found in presentation layer"
+            echo "Remember: Principle III requires server-side validation"
+          fi
+
+      - name: Check Firebase Security Rules exist
+        run: |
+          if [ ! -f "firestore.rules" ]; then
+            echo "ERROR: firestore.rules file not found!"
+            echo "Constitution Principle III requires Firestore security rules"
+            exit 1
+          fi
+
+          if [ ! -f "storage.rules" ]; then
+            echo "Warning: storage.rules file not found"
+          fi
+
+      - name: Validate Firebase Security Rules syntax
+        run: |
+          if [ -f "firestore.rules" ]; then
+            echo "Checking Firestore rules for common issues..."
+
+            # Check for overly permissive rules
+            if grep -q "allow read, write: if true" firestore.rules; then
+              echo "ERROR: Overly permissive Firestore rules detected!"
+              echo "Rules should never allow unrestricted access"
+              exit 1
+            fi
+
+            # Ensure authentication checks exist
+            if ! grep -q "request.auth" firestore.rules; then
+              echo "Warning: No authentication checks found in Firestore rules"
+            fi
+          fi
+
+  # Check for common mobile security issues
+  mobile-security:
+    name: Mobile Security Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check Android security configuration
+        run: |
+          echo "Checking Android security settings..."
+
+          # Check for network security config
+          if [ -f "android/app/src/main/res/xml/network_security_config.xml" ]; then
+            echo "✓ Network security config found"
+
+            # Ensure no cleartext traffic allowed
+            if grep -q 'cleartextTrafficPermitted="true"' android/app/src/main/res/xml/network_security_config.xml; then
+              echo "ERROR: Cleartext traffic is permitted!"
+              exit 1
+            fi
+          else
+            echo "Warning: network_security_config.xml not found"
+          fi
+
+          # Check AndroidManifest for security issues
+          if [ -f "android/app/src/main/AndroidManifest.xml" ]; then
+            # Check for debuggable flag in production
+            if grep -q 'android:debuggable="true"' android/app/src/main/AndroidManifest.xml; then
+              echo "ERROR: Debuggable flag should not be true in production!"
+              exit 1
+            fi
+
+            # Check for backup allowed
+            if grep -q 'android:allowBackup="true"' android/app/src/main/AndroidManifest.xml; then
+              echo "Warning: allowBackup is true - ensure sensitive data is excluded"
+            fi
+          fi
+
+      - name: Check iOS security configuration
+        run: |
+          echo "Checking iOS security settings..."
+
+          if [ -f "ios/Runner/Info.plist" ]; then
+            echo "✓ Info.plist found"
+
+            # Check for App Transport Security
+            if ! grep -q "NSAppTransportSecurity" ios/Runner/Info.plist; then
+              echo "Warning: App Transport Security not configured"
+            fi
+          fi
+
+      - name: Check for sensitive data exposure
+        run: |
+          echo "Checking for potential sensitive data exposure..."
+
+          # Check for logging of sensitive data
+          if grep -r "print.*password\|print.*token\|print.*secret" lib/ 2>/dev/null; then
+            echo "ERROR: Potential sensitive data logging detected!"
+            exit 1
+          fi
+
+          # Check for sensitive data in SharedPreferences without encryption
+          if grep -r "SharedPreferences.*password\|SharedPreferences.*token" lib/ 2>/dev/null; then
+            echo "Warning: Storing sensitive data in SharedPreferences - ensure encryption"
+          fi

@@ -1,0 +1,298 @@
+name: UX & Accessibility Quality
+
+on:
+  push:
+    branches: [master, main, develop]
+  pull_request:
+    branches: [master, main, develop]
+
+jobs:
+  # Constitution Principle VII: Internationalization-First Design
+  # Ensures all user-facing content is internationalized
+  i18n-validation:
+    name: Internationalization Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.0'
+          channel: 'stable'
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      # Constitution Quality Gate: Pre-Commit
+      # - No hardcoded user-facing strings (i18n check)
+      - name: Check for hardcoded strings in UI
+        run: |
+          echo "Checking for hardcoded user-facing strings..."
+
+          # Check for hardcoded strings in presentation layer
+          if grep -r "Text(['\"]" lib/features/*/presentation/ 2>/dev/null | grep -v "AppLocalizations\|Text(widget\|Text(data\|Text(\\\$" | grep -v "_test.dart"; then
+            echo "ERROR: Hardcoded strings found in UI code!"
+            echo "Constitution Principle VII: All user-facing text must use i18n"
+            echo ""
+            echo "Use: Text(AppLocalizations.of(context)!.keyName)"
+            echo "Instead of: Text('hardcoded string')"
+            exit 1
+          fi
+
+          echo "✓ No hardcoded strings detected in presentation layer"
+
+      # Constitution Quality Gate: Pre-Merge
+      # - Localization coverage verified (no missing translation keys)
+      - name: Validate ARB files exist
+        run: |
+          echo "Validating ARB translation files..."
+
+          # Check for English ARB (required)
+          if [ ! -f "lib/l10n/app_en.arb" ]; then
+            echo "ERROR: English ARB file (app_en.arb) not found!"
+            echo "Constitution Principle VII requires English translations"
+            exit 1
+          fi
+
+          # Check for French ARB (required for MVP)
+          if [ ! -f "lib/l10n/app_fr.arb" ]; then
+            echo "ERROR: French ARB file (app_fr.arb) not found!"
+            echo "Constitution Principle VII: MVP requires French translations"
+            exit 1
+          fi
+
+          echo "✓ Both English and French ARB files found"
+
+      - name: Check translation completeness
+        run: |
+          echo "Checking translation completeness..."
+
+          if [ -f "lib/l10n/app_en.arb" ] && [ -f "lib/l10n/app_fr.arb" ]; then
+            # Count keys in English ARB
+            EN_KEYS=$(grep -o '"@\?[a-zA-Z_][a-zA-Z0-9_]*"\s*:' lib/l10n/app_en.arb | grep -v '"@' | wc -l)
+            # Count keys in French ARB
+            FR_KEYS=$(grep -o '"@\?[a-zA-Z_][a-zA-Z0-9_]*"\s*:' lib/l10n/app_fr.arb | grep -v '"@' | wc -l)
+
+            echo "English keys: $EN_KEYS"
+            echo "French keys: $FR_KEYS"
+
+            if [ "$EN_KEYS" -ne "$FR_KEYS" ]; then
+              echo "WARNING: Translation key count mismatch!"
+              echo "English and French should have the same number of keys"
+            else
+              echo "✓ Translation counts match"
+            fi
+          fi
+
+      - name: Check for locale-specific formatting
+        run: |
+          echo "Checking for proper locale formatting..."
+
+          # Check for hardcoded date formats
+          if grep -r "DateFormat(['\"][dMy/]" lib/features/*/presentation/ 2>/dev/null; then
+            echo "Warning: Hardcoded date formats found"
+            echo "Use locale-aware formatting: DateFormat.yMd(locale)"
+          fi
+
+          # Check for hardcoded number formats
+          if grep -r "toString()" lib/features/*/presentation/ | grep -v "enum\|debug" | head -5; then
+            echo "Consider using NumberFormat for locale-aware number formatting"
+          fi
+
+  # Constitution Principle V: User Experience Non-Negotiables
+  # Accessibility validation
+  accessibility:
+    name: Accessibility Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.0'
+          channel: 'stable'
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      # Constitution Principle V: Touch targets minimum 44x44px
+      - name: Check for minimum touch target sizes
+        run: |
+          echo "Checking for minimum touch target sizes (44x44px)..."
+
+          # Check for buttons/interactive elements with sizes below minimum
+          if grep -r "SizedBox.*width.*[0-3][0-9]\|height.*[0-3][0-9]" lib/features/*/presentation/ 2>/dev/null | grep "Button\|GestureDetector\|InkWell"; then
+            echo "Warning: Potentially small touch targets found"
+            echo "Constitution Principle V: Touch targets must be minimum 44x44px"
+          fi
+
+          echo "✓ Touch target check complete"
+
+      - name: Check for semantic labels
+        run: |
+          echo "Checking for semantic labels on interactive elements..."
+
+          # Check for images without semantic labels
+          if grep -r "Image\." lib/features/*/presentation/ 2>/dev/null | grep -v "semanticLabel" | head -5; then
+            echo "Warning: Images without semantic labels found"
+            echo "Add semanticLabel for screen reader support"
+          fi
+
+          # Check for IconButtons without tooltips
+          if grep -r "IconButton(" lib/features/*/presentation/ 2>/dev/null | grep -v "tooltip" | head -5; then
+            echo "Warning: IconButtons without tooltips found"
+            echo "Add tooltip property for accessibility"
+          fi
+
+      # Constitution Principle V: Animations respect accessibility settings
+      - name: Check for accessibility-aware animations
+        run: |
+          echo "Checking animations respect accessibility settings..."
+
+          # Check for animations that should respect reduce-motion
+          if grep -r "AnimationController\|Animation<" lib/features/*/presentation/ 2>/dev/null; then
+            echo "Animations found - ensure they respect MediaQuery.of(context).disableAnimations"
+
+            # Check if reduce-motion is being checked
+            if ! grep -r "disableAnimations\|reducedMotion" lib/ 2>/dev/null; then
+              echo "Warning: No accessibility animation checks found"
+              echo "Constitution Principle V: Animations must respect prefers-reduced-motion"
+            fi
+          fi
+
+      - name: Check color contrast (basic)
+        run: |
+          echo "Checking for potential color contrast issues..."
+
+          # Check for light colors on light backgrounds
+          if grep -r "Colors.white.*color:" lib/core/constants/colors.dart 2>/dev/null; then
+            echo "Ensure white text has sufficient contrast (WCAG AA: 4.5:1)"
+          fi
+
+          # Check for use of color alone for information
+          if grep -r "Colors.red\|Colors.green" lib/features/*/presentation/ | grep -v "Error\|Success\|Icon"; then
+            echo "Warning: Using color alone may not be accessible"
+            echo "Principle V: Don't rely on color alone (color blind users)"
+          fi
+
+  # Constitution Principle V: User Experience Non-Negotiables
+  # UX quality checks
+  ux-quality:
+    name: UX Quality Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.0'
+          channel: 'stable'
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      # Constitution Principle V: Immediate visual feedback < 100ms
+      - name: Check for immediate feedback on interactions
+        run: |
+          echo "Checking for immediate user feedback..."
+
+          # Check for GestureDetector without feedback
+          if grep -r "GestureDetector(" lib/features/*/presentation/ 2>/dev/null; then
+            echo "Found GestureDetectors - ensure immediate visual feedback"
+            echo "Consider using InkWell for material ripple effect"
+          fi
+
+          # Check for buttons without loading states
+          if grep -r "onPressed.*async" lib/features/*/presentation/ 2>/dev/null; then
+            echo "Async button handlers found - ensure loading states are shown"
+          fi
+
+      # Constitution Principle V: Ads only after quiz completion
+      - name: Validate ad placement rules
+        run: |
+          echo "Validating ad placement according to Constitution..."
+
+          # Check that ads are not shown during quiz
+          if grep -r "AdWidget\|InterstitialAd.*show" lib/features/quiz/presentation/screens/quiz_screen.dart 2>/dev/null; then
+            echo "ERROR: Ads found in quiz screen!"
+            echo "Constitution Principle V: Ads only AFTER quiz completion"
+            exit 1
+          fi
+
+          echo "✓ Ad placement rules validated"
+
+      - name: Check for error state handling
+        run: |
+          echo "Checking for proper error state handling..."
+
+          # Check for error widgets in screens
+          if ! grep -r "Error\|error" lib/features/*/presentation/screens/ 2>/dev/null; then
+            echo "Warning: No error handling found in screens"
+            echo "Ensure all screens handle error states gracefully"
+          fi
+
+          # Check for loading states
+          if ! grep -r "CircularProgressIndicator\|Loading" lib/features/*/presentation/screens/ 2>/dev/null; then
+            echo "Warning: No loading indicators found"
+            echo "Ensure async operations show loading feedback"
+          fi
+
+      - name: Check for offline state handling
+        run: |
+          echo "Checking for offline state handling..."
+
+          # Constitution Principle II: Offline Resilience
+          if ! grep -r "connectivity\|offline\|NetworkInfo" lib/ 2>/dev/null; then
+            echo "Warning: No offline handling detected"
+            echo "Constitution Principle II: App must handle offline gracefully"
+          fi
+
+  # Validate UI follows design system
+  design-system:
+    name: Design System Compliance
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for hardcoded colors
+        run: |
+          echo "Checking for hardcoded colors..."
+
+          # Check for hardcoded hex colors in UI code
+          if grep -r "Color(0x[0-9A-Fa-f]\{8\})" lib/features/*/presentation/ 2>/dev/null | grep -v "test"; then
+            echo "Warning: Hardcoded colors found in UI code"
+            echo "Use design system colors from lib/core/constants/colors.dart"
+          fi
+
+          # Check for direct Colors.xxx usage (should use theme)
+          if grep -r "Colors\.[a-z]" lib/features/*/presentation/ | grep -v "transparent\|test" | head -5; then
+            echo "Consider using theme colors instead of direct Colors.xxx"
+          fi
+
+      - name: Check for hardcoded spacing
+        run: |
+          echo "Checking for hardcoded spacing values..."
+
+          # Check for magic numbers in padding/margin
+          if grep -r "EdgeInsets.all([0-9]\+)" lib/features/*/presentation/ 2>/dev/null | grep -v "EdgeInsets.all(0)" | head -5; then
+            echo "Consider using spacing constants from lib/core/constants/spacing.dart"
+          fi
+
+      - name: Check for hardcoded font sizes
+        run: |
+          echo "Checking for hardcoded font sizes..."
+
+          if grep -r "fontSize.*[0-9]\+" lib/features/*/presentation/ 2>/dev/null | head -5; then
+            echo "Consider using typography constants from lib/core/constants/typography.dart"
+          fi

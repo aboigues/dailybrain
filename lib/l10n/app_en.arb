@@ -1,0 +1,268 @@
+{
+  "@@locale": "en",
+
+  "appTitle": "DailyBrain",
+  "@appTitle": {
+    "description": "Application name"
+  },
+
+  "appTagline": "Test your brain in 1 minute",
+  "@appTagline": {
+    "description": "Main tagline on home screen"
+  },
+
+  "startButton": "Start",
+  "@startButton": {
+    "description": "Button to start the quiz"
+  },
+
+  "seeRankingButton": "View Ranking",
+  "@seeRankingButton": {
+    "description": "Button to view the ranking screen"
+  },
+
+  "streakLabel": "Streak: {count} days",
+  "@streakLabel": {
+    "description": "Label showing current streak count",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "12"
+      }
+    }
+  },
+
+  "quizOfTheDay": "Quiz of {date}",
+  "@quizOfTheDay": {
+    "description": "Title showing quiz date",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "Jan 15, 2024"
+      }
+    }
+  },
+
+  "questionsCount": "{count} questions",
+  "@questionsCount": {
+    "description": "Number of questions in quiz",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+
+  "secondsLabel": "{count} seconds",
+  "@secondsLabel": {
+    "description": "Time duration in seconds",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "60"
+      }
+    }
+  },
+
+  "nextQuizIn": "Next quiz in: {time}",
+  "@nextQuizIn": {
+    "description": "Countdown to next quiz",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "18h32"
+      }
+    }
+  },
+
+  "questionProgress": "Question {current}/{total}",
+  "@questionProgress": {
+    "description": "Shows current question number",
+    "placeholders": {
+      "current": {
+        "type": "int",
+        "example": "3"
+      },
+      "total": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+
+  "validateButton": "Validate",
+  "@validateButton": {
+    "description": "Button to validate answer"
+  },
+
+  "congratulations": "Congratulations!",
+  "@congratulations": {
+    "description": "Success message on result screen"
+  },
+
+  "pointsLabel": "POINTS",
+  "@pointsLabel": {
+    "description": "Label for points display"
+  },
+
+  "correctAnswers": "{count} correct answers",
+  "@correctAnswers": {
+    "description": "Number of correct answers",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "4"
+      }
+    }
+  },
+
+  "wrongAnswers": "{count} error",
+  "@wrongAnswers": {
+    "description": "Number of wrong answers",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
+
+  "speedBonus": "Speed bonus: +{points}",
+  "@speedBonus": {
+    "description": "Speed bonus points",
+    "placeholders": {
+      "points": {
+        "type": "int",
+        "example": "28"
+      }
+    }
+  },
+
+  "streakMaintained": "Streak maintained!",
+  "@streakMaintained": {
+    "description": "Message when streak is maintained"
+  },
+
+  "yourRank": "Your rank: #{rank}/{total}",
+  "@yourRank": {
+    "description": "User's ranking position",
+    "placeholders": {
+      "rank": {
+        "type": "int",
+        "example": "234"
+      },
+      "total": {
+        "type": "int",
+        "example": "5892"
+      }
+    }
+  },
+
+  "nextQuizAt": "Next quiz: {time}",
+  "@nextQuizAt": {
+    "description": "Time of next quiz",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "9:15 PM"
+      }
+    }
+  },
+
+  "rankingTitle": "Ranking",
+  "@rankingTitle": {
+    "description": "Ranking screen title"
+  },
+
+  "dailyRanking": "Daily",
+  "@dailyRanking": {
+    "description": "Daily ranking tab"
+  },
+
+  "globalRanking": "Global",
+  "@globalRanking": {
+    "description": "Global ranking tab"
+  },
+
+  "weeklyRanking": "Weekly",
+  "@weeklyRanking": {
+    "description": "Weekly ranking tab"
+  },
+
+  "monthlyRanking": "Monthly",
+  "@monthlyRanking": {
+    "description": "Monthly ranking tab"
+  },
+
+  "you": "YOU",
+  "@you": {
+    "description": "Label for current user in ranking"
+  },
+
+  "alreadyPlayedToday": "You already played today",
+  "@alreadyPlayedToday": {
+    "description": "Message when user already completed today's quiz"
+  },
+
+  "viewMyScore": "View my score",
+  "@viewMyScore": {
+    "description": "Button to view today's score"
+  },
+
+  "noInternet": "No connection",
+  "@noInternet": {
+    "description": "Offline message"
+  },
+
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button"
+  },
+
+  "offlineInfo": "You can view your stats while offline",
+  "@offlineInfo": {
+    "description": "Info message for offline mode"
+  },
+
+  "streakAtRisk": "Your streak is at risk!",
+  "@streakAtRisk": {
+    "description": "Warning when user hasn't played today"
+  },
+
+  "streakAtRiskMessage": "You haven't played yet today",
+  "@streakAtRiskMessage": {
+    "description": "Details for streak at risk"
+  },
+
+  "playNow": "Play now",
+  "@playNow": {
+    "description": "Button to play quiz immediately"
+  },
+
+  "streakLost": "Your {count} day streak is over 😢",
+  "@streakLost": {
+    "description": "Message when streak is lost",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "15"
+      }
+    }
+  },
+
+  "startOver": "Start over",
+  "@startOver": {
+    "description": "Button to start a new streak"
+  },
+
+  "saveStreakMessage": "Watch a video to save your streak",
+  "@saveStreakMessage": {
+    "description": "Message for streak recovery option"
+  },
+
+  "loadingRanking": "Loading ranking...",
+  "@loadingRanking": {
+    "description": "Loading message during ad"
+  }
+}
