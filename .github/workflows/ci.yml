@@ -41,8 +41,8 @@ jobs:
       - name: Build Android APK
         run: flutter build apk --debug
 
-      - name: Build iOS (dry run)
-        run: flutter build ios --no-codesign
+      # Note: iOS build requires macOS runner, skipped on Linux
+      # iOS builds will be validated in a separate macOS-based workflow when needed
 
       # Constitution Quality Gate: Pre-Commit
       # - Linting passes (flutter analyze)
