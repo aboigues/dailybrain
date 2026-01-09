@@ -111,6 +111,7 @@ coverage/
 *.g.dart
 *.freezed.dart
 /lib/generated/
+/lib/l10n/generated/
 
 # macOS
 *.DS_Store
