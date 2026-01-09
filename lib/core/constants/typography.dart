@@ -6,9 +6,15 @@ class AppTypography {
   AppTypography._(); // Private constructor
 
   // Font families
-  static const String fontFamilyHeading = 'Poppins';
-  static const String fontFamilyBody = 'Inter';
-  static const String fontFamilyMono = 'JetBrainsMono';
+  // TODO: Uncomment when custom fonts are added to assets/fonts/
+  // static const String fontFamilyHeading = 'Poppins';
+  // static const String fontFamilyBody = 'Inter';
+  // static const String fontFamilyMono = 'JetBrainsMono';
+
+  // Using system defaults for now
+  static const String? fontFamilyHeading = null; // Will use default heading font
+  static const String? fontFamilyBody = null; // Will use default body font
+  static const String? fontFamilyMono = null; // Will use default monospace font
 
   // Headings
   static const TextStyle h1 = TextStyle(
